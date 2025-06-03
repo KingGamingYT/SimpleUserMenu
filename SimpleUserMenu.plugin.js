@@ -123,7 +123,7 @@ const panelCSS = webpackify(
             max-width: 216px;
         }
         #account-panel > div > div.separator {
-            width: 196px;
+            width: 188px;
         }
         #account-panel > div > div[role="group"] {
             width: 204px;
