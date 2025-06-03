@@ -1,0 +1,1 @@
+A plugin for BetterDiscord which simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
