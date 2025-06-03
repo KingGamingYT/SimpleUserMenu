@@ -14,6 +14,8 @@ const ActivityStore = Webpack.getStore("PresenceStore");
 const Tooltip = Webpack.getModule(Webpack.Filters.byPrototypeKeys("renderTooltip"), { searchExports: true });
 const intl = Webpack.getModule(x=>x.t && x.t.formatToMarkdownString);
 
+const clearClick = (click) => { click.stopPropagation(); Utils.findInTree(ReactUtils.wrapInHooks(Webpack.getByStrings("onCloseProfile:", "trackUserProfileAction:"))({}), r => String(r?.onClick).includes("PRESS_CLEAR_CUSTOM_STATUS")).onClick() };
+
 const TooltipBuilder = ({ note, position, children }) => {
     return (
         React.createElement(Tooltip, {
@@ -73,7 +75,7 @@ function StatusButtonBuilder({user}) {
                     {
                         className: "clearStatusButton", 
                         style: { width: "18px", height: "18px", marginRight: "-7px", backgroundColor: "transparent" }, 
-                        onClick: (click) => { click.stopPropagation(); Utils.findInTree(ReactUtils.wrapInHooks(Webpack.getByStrings("onCloseProfile:", "trackUserProfileAction:"))({}), r => String(r?.onClick).includes("PRESS_CLEAR_CUSTOM_STATUS")).onClick() }
+                        onClick: clearClick
                     }, 
                         createElement('svg', 
                         { 
@@ -121,6 +123,10 @@ const panelCSS = webpackify(
             padding: 6px 0px 0px 8px;
             overflow: unset !important;
             max-width: 216px;
+            .expiringStatusMenuItem {
+                padding: unset;
+                margin-right: 4px;
+            }
         }
         #account-panel > div > div.separator {
             width: 188px;
@@ -241,20 +247,13 @@ module.exports  = class SimplePanelPopout {
             const switcher = Utils.findInTree(res, (tree) => tree?.action === "PRESS_SWITCH_ACCOUNTS", options);
             const point = Utils.findInTree(res, (tree) => Object.hasOwn(tree, 'renderSubmenu'), options);
             const uID = Utils.findInTree(res, (tree) => tree?.id === "copy-user-id", options);
-            console.log(switcher)
-            document.getElementsByClassName("clearStatusButton") 
             
             return [
                 createElement(ContextMenu.Menu, {
                     navId: "account-panel",
                     onClose: props.onClose,
                     children: [
-                        createElement(ContextMenu.Item, {
-                            render() {
-                                return point.renderSubmenu({closePopout: 0})
-                            },
-                            id: "status-picker"
-                        }),
+                        point.renderSubmenu({closePopout: 0}).props.children,
                         createElement(ContextMenu.Group, {
                             children: [
                                 createElement(ContextMenu.Item, {
