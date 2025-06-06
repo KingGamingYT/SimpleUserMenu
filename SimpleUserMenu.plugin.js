@@ -172,27 +172,15 @@ const panelCSS = webpackify(
         }
         #account-panel-custom-status-picker {
             padding: 0;
-            border-radius: 2px;
+            border-radius: 4px;
         }
-        #account-panel-custom-status-picker:hover {
+        #account-panel-custom-status-picker:hover, #account-panel-custom-status-picker:active {
             background: var(--bg-mod-subtle);
             .statusText {
-                color: #fff;
-            }
-            .clearStatusButton svg {
-                fill: #fff !important;
+                color: var(--header-primary);
             }
             .clearStatusButton svg:hover {
                 fill: var(--interactive-hover) !important;
-            }
-        }
-        #account-panel-custom-status-picker:active {
-            background: var(--bg-mod-subtle)
-            .statusText {
-                color: #fff;
-            }
-            .clearStatusButton svg {
-                fill: #fff !important;
             }
         }
         :is(#account-panel-switch-accounts, #account-panel-copy-user-id) .iconContainer:nth-of-type(2) {
