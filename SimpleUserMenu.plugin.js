@@ -13,8 +13,9 @@ const EmojiRenderer = Webpack.getByStrings('translateSurrogatesToInlineEmoji');
 const ActivityStore = Webpack.getStore("PresenceStore");
 const Tooltip = Webpack.getModule(Webpack.Filters.byPrototypeKeys("renderTooltip"), { searchExports: true });
 const intl = Webpack.getModule(x=>x.t && x.t.formatToMarkdownString);
+const closeProfile = Webpack.getByStrings("onCloseProfile:", "trackUserProfileAction:");
 
-const clearClick = (click) => { click.stopPropagation(); Utils.findInTree(ReactUtils.wrapInHooks(Webpack.getByStrings("onCloseProfile:", "trackUserProfileAction:"))({}), r => String(r?.onClick).includes("PRESS_CLEAR_CUSTOM_STATUS")).onClick() };
+const clearClick = (click) => { click.stopPropagation(); Utils.findInTree(ReactUtils.wrapInHooks(closeProfile)({}), r => String(r?.onClick).includes("PRESS_CLEAR_CUSTOM_STATUS")).onClick() };
 
 const TooltipBuilder = ({ note, position, children }) => {
     return (
@@ -258,7 +259,7 @@ module.exports  = class SimplePanelPopout {
                             children: [
                                 createElement(ContextMenu.Item, {
                                     render() {
-                                        return createElement('div', {className: "item status-picker-custom-status", onClick: () => { Utils.findInTree(ReactUtils.wrapInHooks(Webpack.getByStrings("onCloseProfile:", "trackUserProfileAction:"))({}), r => String(r?.onClick).includes("PRESS_EDIT_CUSTOM_STATUS")).onClick() }, children: createElement(StatusButtonBuilder, {user})})
+                                        return createElement('div', {className: "item status-picker-custom-status", onClick: () => { Utils.findInTree(ReactUtils.wrapInHooks(closeProfile)({}), r => String(r?.onClick).includes("PRESS_EDIT_CUSTOM_STATUS")).onClick() }, children: createElement(StatusButtonBuilder, {user})})
                                     },
                                     id: "custom-status-picker"
                                 }),
