@@ -255,7 +255,8 @@ module.exports  = class SimplePanelPopout {
                                 createElement(ContextMenu.Item, {
                                     ...switcher,
                                     action: switcher.onClick,
-                                    children: switcher.renderSubmenu({closePopout: props.onClose}).props.children
+                                    children: switcher.renderSubmenu({closePopout: props.onClose}).props.children,
+                                    id: "switch-accounts"
                                 }),
                                 uID && [
                                     createElement(ContextMenu.Separator),
