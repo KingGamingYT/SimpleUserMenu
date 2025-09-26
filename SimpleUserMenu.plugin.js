@@ -119,6 +119,9 @@ const panelCSS = webpackify(
             margin-left: 3px;
             width: 220px;
             padding-bottom: 8px !important;
+            .colorDefault .label {
+                color: unset;
+            }
         }
         #account-panel > .scroller {
             padding: 6px 0px 0px 8px;
@@ -193,9 +196,6 @@ const panelCSS = webpackify(
         }
         #account-panel-copy-user-id .iconContainer:nth-of-type(2) {
             margin-left: -2px;
-        }
-        .colorDefault .label {
-            color: unset;
         }
     `
 )
