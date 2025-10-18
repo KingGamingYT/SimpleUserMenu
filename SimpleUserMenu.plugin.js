@@ -2,7 +2,7 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.0.2
+ * @version 1.0.3
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
@@ -262,7 +262,8 @@ module.exports  = class SimplePanelPopout {
                                     createElement(ContextMenu.Separator),
                                     createElement(ContextMenu.Item, {
                                         ...uID,
-                                        action: uID.onClick
+                                        action: uID.onClick,
+                                        id: "copy-user-id"
                                     })
                                 ]
                             ]
