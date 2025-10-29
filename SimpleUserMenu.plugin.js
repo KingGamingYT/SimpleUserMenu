@@ -2,7 +2,7 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.0.4
+ * @version 1.0.5
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
@@ -38,7 +38,7 @@ const changelog = {
             "title": "Changes",
             "type" : "improved",
             "items": [
-                "Fixed a filtering issue."
+                "Fixed a missing string."
             ]
         }
     ]
@@ -103,7 +103,7 @@ function StatusButtonBuilder({user}) {
             }),
             createElement('div', 
             { 
-                className: "statusText" }, intl.intl.formatToPlainString(intl.t['/UonHB']
+                className: "statusText" }, intl.intl.formatToPlainString(intl.t['zrpF/b']
             ))
         ]
     );
