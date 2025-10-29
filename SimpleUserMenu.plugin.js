@@ -2,7 +2,7 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.0.3
+ * @version 1.0.4
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
@@ -232,7 +232,7 @@ module.exports  = class SimplePanelPopout {
                 ],
                 ignore: []
             };
-            const user = Utils.findInTree(res, (tree) => Object.hasOwn(tree, 'displayProfile'), options);
+            const user = Utils.findInTree(res, (tree) => Object.hasOwn(tree, 'user'), options);
             const switcher = Utils.findInTree(res, (tree) => tree?.action === "PRESS_SWITCH_ACCOUNTS", options);
             const point = Utils.findInTree(res, (tree) => Object.hasOwn(tree, 'renderSubmenu') && Object.hasOwn(tree, 'sublabel'), options);
             const uID = Utils.findInTree(res, (tree) => tree?.action === "COPY_USER_ID", options);
