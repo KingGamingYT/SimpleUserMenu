@@ -70,7 +70,7 @@ function StatusButtonBuilder({user}) {
                 ),
                 createElement(TooltipBuilder, 
                 { 
-                    note: intl.intl.formatToPlainString(intl.t['3DagBA'])
+                    note: intl.intl.formatToPlainString(intl.t['3DagBC'])
                 }, 
                     createElement('button', 
                     {
@@ -103,7 +103,7 @@ function StatusButtonBuilder({user}) {
             }),
             createElement('div', 
             { 
-                className: "statusText" }, intl.intl.formatToPlainString(intl.t['zrpF/b']
+                className: "statusText" }, intl.intl.formatToPlainString(intl.t['/UonHN']
             ))
         ]
     );
