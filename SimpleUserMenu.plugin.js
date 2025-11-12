@@ -2,7 +2,7 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.0.5
+ * @version 1.0.6
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
@@ -38,7 +38,7 @@ const changelog = {
             "title": "Changes",
             "type" : "improved",
             "items": [
-                "Fixed a missing string."
+                "Styling tweaks."
             ]
         }
     ]
@@ -57,7 +57,7 @@ if (!BdApi.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED) {
 function StatusButtonBuilder({user}) {
     const status = ActivityStore.getPrimaryActivity(user.user.id);
     if (status?.type === 4) {
-        return createElement('div', { className: "statusItemContainer", style: { display: "flex" }}, 
+        return createElement('div', { className: status?.emoji ? "customStatusWithEmoji statusItemContainer" : "statusItemContainer" }, 
             [
                 status.emoji && createElement(EmojiRenderer, 
                 { 
@@ -75,7 +75,7 @@ function StatusButtonBuilder({user}) {
                     createElement('button', 
                     {
                         className: "clearStatusButton", 
-                        style: { width: "18px", height: "18px", marginRight: "-7px", backgroundColor: "transparent" }, 
+                        style: { backgroundColor: "transparent" }, 
                         onClick: clearClick
                     }, 
                         createElement('svg', 
@@ -116,7 +116,7 @@ const styles = Object.assign({},
 const panelCSS = webpackify(
     `
         #account-panel {
-            margin-left: 3px;
+            margin-left: 1px;
             width: 220px;
             padding-bottom: 8px !important;
             .colorDefault .label {
@@ -151,33 +151,51 @@ const panelCSS = webpackify(
                 background: unset !important;
             }
         }
-        .status-picker-custom-status {
+        #status-picker-custom-status {
             padding: 6px 8px;
             cursor: pointer;
             .statusItemContainer {
-                margin: 0 8px;
+                box-sizing: border-box;
+                display: grid;
+                grid-template-areas: "status clear";
+                grid-template-columns: 1fr 20px;
+                align-items: center;
+                width: 100%;
+                min-height: 24px;
+            }
+            .customStatusWithEmoji {
+                grid-template-areas: "icon status clear";
+                grid-template-columns: 24px 1fr 20px;
+                grid-template-rows: 24px;
             }
             .statusText {
+                grid-area: status;
                 min-width: 0;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 align-self: center;
-                flex: 1;
             }
             img {
-                width: 16px;
-                height: 16px;
-                margin-left: -9px;
-                padding-right: 10px;
+                grid-area: icon;
+                margin-left: -2px;
+                width: 18px;
+                height: 18px;
                 align-self: center;
             }
+            .clearStatusButton {
+                grid-area: clear;
+                line-height: 0;
+                width: 18px;
+                height: 18px;
+                margin-left: 4px;
+            }
         }
-        #account-panel-custom-status-picker {
+        #account-panel-status-picker-custom-status {
             padding: 0;
             border-radius: 4px;
         }
-        #account-panel-custom-status-picker:hover, #account-panel-custom-status-picker:active {
+        #account-panel-status-picker-custom-status:hover, #account-panel-status-picker-custom-status:active {
             background: var(--bg-mod-subtle);
             .statusText {
                 color: var(--header-primary);
@@ -247,9 +265,9 @@ module.exports  = class SimplePanelPopout {
                             children: [
                                 createElement(ContextMenu.Item, {
                                     render() {
-                                        return createElement('div', {className: "item status-picker-custom-status", onClick: () => { Utils.findInTree(ReactUtils.wrapInHooks(closeProfile)({}), r => String(r?.onClick).includes("PRESS_EDIT_CUSTOM_STATUS")).onClick() }, children: createElement(StatusButtonBuilder, {user})})
+                                        return createElement('div', {className: "item", id: "status-picker-custom-status", onClick: () => { Utils.findInTree(ReactUtils.wrapInHooks(closeProfile)({}), r => String(r?.onClick).includes("PRESS_EDIT_CUSTOM_STATUS")).onClick() }, children: createElement(StatusButtonBuilder, {user})})
                                     },
-                                    id: "custom-status-picker"
+                                    id: "status-picker-custom-status"
                                 }),
                                 createElement(ContextMenu.Separator),
                                 createElement(ContextMenu.Item, {
