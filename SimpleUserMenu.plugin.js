@@ -2,7 +2,7 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.0.6
+ * @version 1.0.7
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
@@ -57,7 +57,7 @@ if (!BdApi.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED) {
 function StatusButtonBuilder({user}) {
     const status = ActivityStore.getPrimaryActivity(user.user.id);
     if (status?.type === 4) {
-        return createElement('div', { className: status?.emoji ? "customStatusWithEmoji statusItemContainer" : "statusItemContainer" }, 
+        return createElement('div', { className: status?.emoji ? "customStatusWithEmoji statusItemContainer" : "customStatusWithoutEmoji statusItemContainer" }, 
             [
                 status.emoji && createElement(EmojiRenderer, 
                 { 
@@ -93,13 +93,12 @@ function StatusButtonBuilder({user}) {
             ]
         ) 
     }
-    return createElement('div', { className: "statusItemContainer", style: { display: "flex" }}, 
+    return createElement('div', { className: "statusItemContainer" }, 
         [
             createElement('img', 
             { 
                 className: "customEmojiPlaceholder", 
-                src: "https://discord.com/assets/25acad70d165d46b460754aacfdc388b.svg", 
-                style: { width: "18px", height: "18px"}
+                src: "https://discord.com/assets/25acad70d165d46b460754aacfdc388b.svg"
             }),
             createElement('div', 
             { 
@@ -152,20 +151,27 @@ const panelCSS = webpackify(
             }
         }
         #status-picker-custom-status {
-            padding: 6px 8px;
+            padding: 4px 8px;
             cursor: pointer;
             .statusItemContainer {
                 box-sizing: border-box;
                 display: grid;
-                grid-template-areas: "status clear";
-                grid-template-columns: 1fr 20px;
+                grid-template-areas: "icon status" ". description";
+                grid-template-rows: 24px 1fr;
+                grid-template-columns: 24px 1fr;
                 align-items: center;
                 width: 100%;
                 min-height: 24px;
             }
+            .customStatusWithoutEmoji {
+                grid-template-areas: "status clear";
+                grid-template-columns: 1fr 20px;
+            }
             .customStatusWithEmoji {
                 grid-template-areas: "icon status clear";
                 grid-template-columns: 24px 1fr 20px;
+            }
+            .customStatusWithoutEmoji, .customStatusWithEmoji {
                 grid-template-rows: 24px;
             }
             .statusText {
