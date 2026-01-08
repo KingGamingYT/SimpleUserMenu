@@ -204,7 +204,7 @@ const panelCSS = webpackify(
         #account-panel-status-picker-custom-status:hover, #account-panel-status-picker-custom-status:active {
             background: var(--bg-mod-subtle);
             .statusText {
-                color: var(--header-primary, var(--text-default));
+                color: var(--header-primary, var(--interactive-text-default));
             }
             .clearStatusButton svg:hover {
                 fill: var(--interactive-icon-hover) !important;
