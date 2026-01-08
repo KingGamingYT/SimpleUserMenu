@@ -2,7 +2,7 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.0.7
+ * @version 1.0.8
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
@@ -38,7 +38,7 @@ const changelog = {
             "title": "Changes",
             "type" : "improved",
             "items": [
-                "Styling tweaks."
+                "Fix CSS variables"
             ]
         }
     ]
@@ -80,7 +80,7 @@ function StatusButtonBuilder({user}) {
                     }, 
                         createElement('svg', 
                         { 
-                            style: { fill: "var(--interactive-normal)", width: "18px", height: "18px", marginLeft: "-7px" }
+                            style: { fill: "var(--interactive-icon-default)", width: "18px", height: "18px", marginLeft: "-7px" }
                         }, 
                             createElement('path', 
                                 { 
@@ -204,10 +204,10 @@ const panelCSS = webpackify(
         #account-panel-status-picker-custom-status:hover, #account-panel-status-picker-custom-status:active {
             background: var(--bg-mod-subtle);
             .statusText {
-                color: var(--header-primary);
+                color: var(--header-primary, var(--text-default));
             }
             .clearStatusButton svg:hover {
-                fill: var(--interactive-hover) !important;
+                fill: var(--interactive-icon-hover) !important;
             }
         }
         :is(#account-panel-switch-accounts, #account-panel-copy-user-id) .iconContainer:nth-of-type(2) {
