@@ -2,7 +2,7 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.0.8
+ * @version 1.0.9
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
@@ -38,7 +38,7 @@ const changelog = {
             "title": "Changes",
             "type" : "improved",
             "items": [
-                "Fix CSS variables"
+                "Plugin works again after Discord internal changes."
             ]
         }
     ]
@@ -108,8 +108,8 @@ function StatusButtonBuilder({user}) {
     );
 }
 const styles = Object.assign({},
-    Webpack.getByKeys('scroller', 'separator', 'iconContainer'),
-    Webpack.getByKeys('statusPickerModalMenu')
+    Object.getOwnPropertyDescriptors(Webpack.getByKeys('scroller', 'separator', 'iconContainer')),
+    Object.getOwnPropertyDescriptors(Webpack.getByKeys('statusPickerModalMenu'))
 );
 
 const panelCSS = webpackify(
@@ -226,7 +226,7 @@ const panelCSS = webpackify(
 function webpackify(css) {
     for (const key in styles) {
         let regex = new RegExp(`\\.${key}([\\s,.):>])`, 'g');
-        css = css.replace(regex, `.${styles[key]}$1`);
+        css = css.replace(regex, `.${styles[key].value}$1`);
     }
     return css;
 }
@@ -248,7 +248,7 @@ module.exports  = class SimplePanelPopout {
             });
         }
         DOM.addStyle('panelCSS', panelCSS)
-        Patcher.after('SimpleUserMenu', UserModal, "Z", (that, [props], res) => {
+        Patcher.after('SimpleUserMenu', UserModal, "A", (that, [props], res) => {
             const options = {
                 walkable: [
                     'props',
