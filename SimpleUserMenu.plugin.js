@@ -2,7 +2,7 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.0.9
+ * @version 1.1.0
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
@@ -38,7 +38,7 @@ const changelog = {
             "title": "Changes",
             "type" : "improved",
             "items": [
-                "Plugin works again after Discord internal changes."
+                "Fix styling following Discord's 'mana' menu component transition"
             ]
         }
     ]
@@ -118,12 +118,32 @@ const panelCSS = webpackify(
             margin-left: 1px;
             width: 220px;
             padding-bottom: 8px !important;
-            .colorDefault .label {
+            > .scroller > .colorDefault, > .scroller > div > .colorDefault:not([id="account-panel-copy-user-id"], [id="account-panel-idle"]) {
+                display: grid;
+                grid-template-areas: "icon status carat" ". status carat";
+                grid-template-columns: 20px 1fr;
+                grid-template-rows: 20px 1fr;
+                .label {
+                    grid-area: status
+                }
+                .statusAccessory {
+                    grid-area: icon;
+                    justify-content: unset;
+                }
+                .iconContainer {
+                    grid-area: carat
+                }
+            }
+            .colorDefault:is([id="account-panel-idle"]) .statusAccessory {
+                justify-content: unset;
+                margin-inline-end: unset;
+            }
+            .colorDefault :is(.label, .subtext) {
                 color: unset;
             }
         }
         #account-panel > .scroller {
-            padding: 6px 0px 0px 8px;
+            padding: 6px 4px 0px 8px !important;
             overflow: unset !important;
             max-width: 216px;
             .expiringStatusMenuItem {
@@ -225,6 +245,7 @@ const panelCSS = webpackify(
 )
 function webpackify(css) {
     for (const key in styles) {
+        styles[key].value = String(styles[key].value).split(' ', 1)[0];
         let regex = new RegExp(`\\.${key}([\\s,.):>])`, 'g');
         css = css.replace(regex, `.${styles[key].value}$1`);
     }
