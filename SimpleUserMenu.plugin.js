@@ -2,20 +2,25 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.1.0
+ * @version 1.1.1
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
-const { createElement } = React;
+const { createElement, cloneElement } = React;
 
-const UserModal = Webpack.getByStrings("switch-accounts", "PRESS_SWITCH_ACCOUNTS", { defaultExport: false });
+const UserStore = Webpack.getStore("UserStore");
+const UserPanel = Webpack.getBySource('speakingWhileMutedTooltipTimeout', {searchExports: true});
 const EmojiRenderer = Webpack.getByStrings('translateSurrogatesToInlineEmoji');
 const ActivityStore = Webpack.getStore("PresenceStore");
 const Tooltip = Webpack.getModule(Webpack.Filters.byPrototypeKeys("renderTooltip"), { searchExports: true });
 const intl = Webpack.getModule(x=>x.t && x.t.formatToMarkdownString);
 const closeProfile = Webpack.getByStrings("onCloseProfile:", "trackUserProfileAction:");
+const popoverBubble = ReactUtils.wrapInHooks(Webpack.getBySource('USER_PROFILE_CUSTOM_STATUS_BUBBLE', 'previewText', {searchExports: true}).A)({user: UserStore.getCurrentUser()}).props.children;
+const popoverOuterButtons = ReactUtils.wrapInHooks(popoverBubble.type)(popoverBubble.props).props.renderToolbar(true);
+const popoverButtons = ReactUtils.wrapInHooks(popoverOuterButtons.type)(popoverOuterButtons.props)
+const patcher = ReactUtils.createNodePatcher();
 
-const clearClick = (click) => { click.stopPropagation(); Utils.findInTree(ReactUtils.wrapInHooks(closeProfile)({}), r => String(r?.onClick).includes("PRESS_CLEAR_CUSTOM_STATUS")).onClick() };
+const clearClick = (click) => { click.stopPropagation(); Utils.findInTree(popoverButtons, r => String(r?.onClick).includes("PRESS_CLEAR_CUSTOM_STATUS")).onClick() };
 
 const TooltipBuilder = ({ note, position, children }) => {
     return (
@@ -38,7 +43,7 @@ const changelog = {
             "title": "Changes",
             "type" : "improved",
             "items": [
-                "Fix styling following Discord's 'mana' menu component transition"
+                "The plugin works again"
             ]
         }
     ]
@@ -63,7 +68,7 @@ function StatusButtonBuilder({user}) {
                 { 
                     emoji: status.emoji 
                 }),
-                createElement('div', 
+                createElement('span', 
                 {
                     className: "statusText"}, 
                     status.state
@@ -80,11 +85,11 @@ function StatusButtonBuilder({user}) {
                     }, 
                         createElement('svg', 
                         { 
-                            style: { fill: "var(--interactive-icon-default)", width: "18px", height: "18px", marginLeft: "-7px" }
+                            className: "clearStatusIcon", width: "24", height: "24", viewBox: "0 0 14 14"
                         }, 
                             createElement('path', 
                                 { 
-                                    d: "M7.02799 0.333252C3.346 0.333252 0.361328 3.31792 0.361328 6.99992C0.361328 10.6819 3.346 13.6666 7.02799 13.6666C10.71 13.6666 13.6947 10.6819 13.6947 6.99992C13.6947 3.31792 10.7093 0.333252 7.02799 0.333252ZM10.166 9.19525L9.22333 10.1379L7.02799 7.94325L4.83266 10.1379L3.89 9.19525L6.08466 6.99992L3.88933 4.80459L4.832 3.86259L7.02733 6.05792L9.22266 3.86259L10.1653 4.80459L7.97066 6.99992L10.166 9.19525Z", transform: "scale(1.3)" 
+                                    fill: "currentColor", d: "M7.02799 0.333252C3.346 0.333252 0.361328 3.31792 0.361328 6.99992C0.361328 10.6819 3.346 13.6666 7.02799 13.6666C10.71 13.6666 13.6947 10.6819 13.6947 6.99992C13.6947 3.31792 10.7093 0.333252 7.02799 0.333252ZM10.166 9.19525L9.22333 10.1379L7.02799 7.94325L4.83266 10.1379L3.89 9.19525L6.08466 6.99992L3.88933 4.80459L4.832 3.86259L7.02733 6.05792L9.22266 3.86259L10.1653 4.80459L7.97066 6.99992L10.166 9.19525Z" 
                                 }
                             )
                         )
@@ -212,9 +217,12 @@ const panelCSS = webpackify(
             .clearStatusButton {
                 grid-area: clear;
                 line-height: 0;
-                width: 18px;
-                height: 18px;
-                margin-left: 4px;
+            }
+            .clearStatusIcon {
+                color: var(--interactive-icon-default);
+                width: 16px;
+                height: 16px;
+                margin-left: -7px;
             }
         }
         #account-panel-status-picker-custom-status {
@@ -226,8 +234,8 @@ const panelCSS = webpackify(
             .statusText {
                 color: var(--header-primary, var(--interactive-text-default));
             }
-            .clearStatusButton svg:hover {
-                fill: var(--interactive-icon-hover) !important;
+            .clearStatusIcon:hover {
+                color: var(--interactive-icon-hover) !important;
             }
         }
         :is(#account-panel-switch-accounts, #account-panel-copy-user-id) .iconContainer:nth-of-type(2) {
@@ -269,53 +277,67 @@ module.exports  = class SimplePanelPopout {
             });
         }
         DOM.addStyle('panelCSS', panelCSS)
-        Patcher.after('SimpleUserMenu', UserModal, "A", (that, [props], res) => {
-            const options = {
-                walkable: [
-                    'props',
-                    'children'
-                ],
-                ignore: []
-            };
-            const user = Utils.findInTree(res, (tree) => Object.hasOwn(tree, 'user'), options);
-            const switcher = Utils.findInTree(res, (tree) => tree?.action === "PRESS_SWITCH_ACCOUNTS", options);
-            const point = Utils.findInTree(res, (tree) => Object.hasOwn(tree, 'renderSubmenu') && Object.hasOwn(tree, 'sublabel'), options);
-            const uID = Utils.findInTree(res, (tree) => tree?.action === "COPY_USER_ID", options);
-            
-            return [
-                createElement(ContextMenu.Menu, {
-                    navId: "account-panel",
-                    onClose: props.onClose,
-                    children: [
-                        point.renderSubmenu({closePopout: 0}).props.children,
-                        createElement(ContextMenu.Group, {
-                            children: [
-                                createElement(ContextMenu.Item, {
-                                    render() {
-                                        return createElement('div', {className: "item", id: "status-picker-custom-status", onClick: () => { Utils.findInTree(ReactUtils.wrapInHooks(closeProfile)({}), r => String(r?.onClick).includes("PRESS_EDIT_CUSTOM_STATUS")).onClick() }, children: createElement(StatusButtonBuilder, {user})})
-                                    },
-                                    id: "status-picker-custom-status"
-                                }),
-                                createElement(ContextMenu.Separator),
-                                createElement(ContextMenu.Item, {
-                                    ...switcher,
-                                    action: switcher.onClick,
-                                    children: switcher.renderSubmenu({closePopout: props.onClose}).props.children,
-                                    id: "switch-accounts"
-                                }),
-                                uID && [
-                                    createElement(ContextMenu.Separator),
-                                    createElement(ContextMenu.Item, {
-                                        ...uID,
-                                        action: uID.onClick,
-                                        id: "copy-user-id"
-                                    })
-                                ]
+        Patcher.after('SimpleUserMenu', UserPanel.g.prototype, "renderNameZone", (that, [props], res) => {
+            patcher.patch(res.props.children, (props, res) => {
+                const node = res.props.children
+
+                res.props.children = cloneElement(node, {
+                    renderPopout(...args) {
+                        const ret = node.props.renderPopout.apply(this, args);
+
+                        patcher.patch(ret, (props, res) => {
+                            const options = {
+                                walkable: [
+                                    'props',
+                                    'children'
+                                ],
+                                ignore: []
+                            };
+                            const user = Utils.findInTree(res, (tree) => Object.hasOwn(tree, 'user'), options);
+                            const switcher = Utils.findInTree(res, (tree) => tree?.action === "PRESS_SWITCH_ACCOUNTS", options);
+                            const point = Utils.findInTree(res, (tree) => Object.hasOwn(tree, 'renderSubmenu') && Object.hasOwn(tree, 'sublabel'), options);
+                            const uID = Utils.findInTree(res, (tree) => tree?.action === "COPY_USER_ID", options);
+                            
+                            return [
+                                createElement(ContextMenu.Menu, {
+                                    navId: "account-panel",
+                                    onClose: props.onClose,
+                                    children: [
+                                        point.renderSubmenu({closePopout: 0}).props.children,
+                                        createElement(ContextMenu.Group, {
+                                            children: [
+                                                createElement(ContextMenu.Item, {
+                                                    render() {
+                                                        return createElement('div', {className: "item", id: "status-picker-custom-status", onClick: () => { Utils.findInTree(popoverButtons, r => String(r?.onClick).includes("PRESS_EDIT_CUSTOM_STATUS")).onClick() }, children: createElement(StatusButtonBuilder, {user})})
+                                                    },
+                                                    id: "status-picker-custom-status"
+                                                }),
+                                                createElement(ContextMenu.Separator),
+                                                createElement(ContextMenu.Item, {
+                                                    ...switcher,
+                                                    action: switcher.onClick,
+                                                    children: switcher.renderSubmenu({closePopout: props.onClose}).props.children,
+                                                    id: "switch-accounts"
+                                                }),
+                                                uID && [
+                                                    createElement(ContextMenu.Separator),
+                                                    createElement(ContextMenu.Item, {
+                                                        ...uID,
+                                                        action: uID.onClick,
+                                                        id: "copy-user-id"
+                                                    })
+                                                ]
+                                            ]
+                                        })
+                                    ]
+                                })
                             ]
                         })
-                    ]
+
+                        return ret;
+                    }
                 })
-            ]
+            })
         })
     }
 
