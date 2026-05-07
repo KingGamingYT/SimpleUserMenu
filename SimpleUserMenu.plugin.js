@@ -2,7 +2,7 @@
  * @name SimpleUserMenu
  * @author KingGamingYT
  * @description Simplifies the user panel menu, giving it only the essentials and features it had pre-2024.
- * @version 1.1.1
+ * @version 1.1.2
  */ 
 
 const { Data, Webpack, React, ReactUtils, Patcher, DOM, UI, Utils, ContextMenu } = BdApi;
@@ -15,9 +15,7 @@ const ActivityStore = Webpack.getStore("PresenceStore");
 const Tooltip = Webpack.getModule(Webpack.Filters.byPrototypeKeys("renderTooltip"), { searchExports: true });
 const intl = Webpack.getModule(x=>x.t && x.t.formatToMarkdownString);
 const closeProfile = Webpack.getByStrings("onCloseProfile:", "trackUserProfileAction:");
-const popoverBubble = ReactUtils.wrapInHooks(Webpack.getBySource('USER_PROFILE_CUSTOM_STATUS_BUBBLE', 'previewText', {searchExports: true}).A)({user: UserStore.getCurrentUser()}).props.children;
-const popoverOuterButtons = ReactUtils.wrapInHooks(popoverBubble.type)(popoverBubble.props).props.renderToolbar(true);
-const popoverButtons = ReactUtils.wrapInHooks(popoverOuterButtons.type)(popoverOuterButtons.props)
+const popoverButtons = ReactUtils.wrapInHooks(Webpack.getBySource('USER_PROFILE_CUSTOM_STATUS_BUBBLE', 'previewText', {declarationFilter: Webpack.Filters.byStrings("PRESS_CLEAR_CUSTOM_STATUS")}))({isVisible: true});
 const patcher = ReactUtils.createNodePatcher();
 
 const clearClick = (click) => { click.stopPropagation(); Utils.findInTree(popoverButtons, r => String(r?.onClick).includes("PRESS_CLEAR_CUSTOM_STATUS")).onClick() };
